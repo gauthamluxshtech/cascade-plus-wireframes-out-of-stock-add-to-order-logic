@@ -1,0 +1,2781 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CASCADE Settings</title>
+  <style>
+    :root {
+      --green: #047857;
+      --green-dark: #065f46;
+      --green-soft: #ecfdf5;
+      --table-header-gradient: linear-gradient(180deg, #d8f3e6 0%, #a9dfc6 100%);
+      --row-alt-gradient: linear-gradient(90deg, #ffffff 0%, #f7fbff 100%);
+      --row-active-gradient: linear-gradient(90deg, #f7fffb 0%, #e4faef 100%);
+      --ink: #17212f;
+      --muted: #667085;
+      --line: #d9e0e8;
+      --soft: #f6f8fa;
+      --app-bg: #f6f8f7;
+      --panel: #ffffff;
+      --red: #c24132;
+      --red-soft: #fff1f0;
+      --shadow: 0 18px 44px rgba(23, 33, 47, 0.14);
+      --amber: #b45309;
+      --amber-soft: #fff7ed;
+      --amber-line: #fcd9b0;
+      font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background: var(--app-bg);
+      background-attachment: fixed;
+      background-size: cover;
+      background-position: center bottom;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    .app-shell {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      min-height: 64px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 22px;
+      padding: 0 24px;
+      color: #fff;
+      background: #111827;
+      box-shadow: 0 2px 8px rgba(6, 95, 70, 0.2);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .brand-logo {
+      width: auto;
+      height: 48px;
+      max-width: 124px;
+      object-fit: contain;
+    }
+
+    .main-nav {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      align-self: stretch;
+      overflow: visible;
+    }
+
+    .main-nav a,
+    .main-nav button,
+    .profile-button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px 8px 0 0;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+      text-transform: uppercase;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .main-nav a.active,
+    .main-nav a:hover,
+    .main-nav button.active,
+    .main-nav button:hover,
+    .nav-more.active>.more-toggle,
+    .nav-more:hover>.more-toggle,
+    .nav-more:focus-within>.more-toggle {
+      color: var(--green);
+      background: #fff;
+    }
+
+    .main-nav a.active,
+    .main-nav button.active,
+    .nav-more.active {
+      position: relative;
+      margin-top: 12px;
+    }
+
+    .nav-more {
+      position: relative;
+      display: inline-flex;
+      align-items: flex-end;
+    }
+
+    .more-toggle {
+      gap: 8px;
+    }
+
+    .more-toggle::after {
+      content: "";
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid currentColor;
+    }
+
+    .more-menu {
+      position: absolute;
+      top: calc(100% - 1px);
+      left: 0;
+      z-index: 30;
+      min-width: 178px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      padding: 8px;
+      border-radius: 0 0 8px 8px;
+      background: #fff;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2);
+    }
+
+    .nav-more:hover .more-menu,
+    .nav-more:focus-within .more-menu {
+      display: flex;
+    }
+
+    .main-nav .more-menu a {
+      position: static;
+      min-height: 38px;
+      border-radius: 6px;
+      margin-top: 0;
+      padding: 0 12px;
+      color: var(--ink);
+      background: transparent;
+    }
+
+    .main-nav .more-menu a:hover,
+    .main-nav .more-menu a:focus-visible,
+    .main-nav .more-menu a.active {
+      color: #fff;
+      background: var(--green);
+    }
+
+    .profile-button {
+      min-height: 36px;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .profile-button::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-right: 1.5px solid currentColor;
+      border-bottom: 1.5px solid currentColor;
+      transform: translateY(-2px) rotate(45deg);
+    }
+
+    .account-menu {
+      position: relative;
+      justify-self: end;
+    }
+
+    .account-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 60;
+      width: min(232px, calc(100vw - 24px));
+      display: none;
+      flex-direction: column;
+      padding: 8px 0;
+      border-radius: 8px;
+      color: rgba(255, 255, 255, 0.9);
+      background: #0f1726;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, 0.28);
+    }
+
+    .account-menu.is-open .account-dropdown {
+      display: flex;
+    }
+
+    .account-dropdown::before {
+      content: "";
+      position: absolute;
+      top: -9px;
+      right: 18px;
+      width: 18px;
+      height: 18px;
+      background: #0f1726;
+      border-radius: 3px 0 0 0;
+      transform: rotate(45deg);
+    }
+
+    .account-menu-item {
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border: 0;
+      padding: 0 16px;
+      color: rgba(255, 255, 255, 0.86);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .account-menu-item:hover,
+    .account-menu-item:focus-visible {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+      outline: 0;
+    }
+
+    .account-menu-item svg {
+      width: 22px;
+      height: 22px;
+      flex: 0 0 auto;
+      stroke: currentColor;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+
+    .account-menu-separator {
+      height: 1px;
+      margin: 8px 0;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .workspace {
+      max-width: 1420px;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+    }
+
+    .site-footer {
+      margin-top: 22px;
+      border-top: 1px solid rgba(217, 224, 232, 0.9);
+      padding: 22px 0 2px;
+      color: #7a879a;
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .page-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .heading-copy {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    h1,
+    h2,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 0;
+      font-size: 30px;
+      line-height: 1.12;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .subheading {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .primary-action {
+      min-height: 42px;
+      border: 0;
+      border-radius: 6px;
+      padding: 0 28px;
+      color: #fff;
+      background: var(--green);
+      font-weight: 700;
+      text-transform: capitalize;
+      white-space: nowrap;
+    }
+
+    .secondary-action {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 28px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .toast-region {
+      position: fixed;
+      z-index: 90;
+      top: 18px;
+      right: 18px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .toast {
+      width: min(360px, calc(100vw - 36px));
+      border-left: 4px solid var(--green);
+      border-radius: 8px;
+      padding: 14px 16px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    dialog {
+      border: 0;
+      padding: 0;
+      background: transparent;
+    }
+
+    dialog::backdrop {
+      background: rgba(17, 24, 39, 0.48);
+    }
+
+    .modal-panel {
+      width: min(440px, calc(100vw - 32px));
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-header,
+    .modal-body,
+    .modal-footer {
+      padding: 18px 22px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-body {
+      display: grid;
+      gap: 12px;
+      background: #f8fafc;
+      text-align: center;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .warning-icon {
+      width: 70px;
+      height: 70px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 12px;
+      border: 3px solid #ffb982;
+      border-radius: 999px;
+      color: #ff9d57;
+      font-size: 42px;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        padding: 14px;
+      }
+
+      .main-nav {
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .main-nav a,
+      .main-nav button {
+        min-height: 36px;
+        border-radius: 8px;
+      }
+
+      .main-nav a.active,
+      .main-nav button.active,
+      .nav-more.active {
+        margin-top: 0;
+      }
+
+      .page-heading {
+        align-items: stretch;
+        flex-direction: column;
+      }
+    }
+
+    /* ---------- Settings ---------- */
+    .panel {
+      margin-bottom: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 8px 22px rgba(23, 33, 47, 0.07);
+    }
+
+    .panel.accent {
+      border-top: 4px solid var(--green);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      padding: 18px 20px 0;
+    }
+
+    .panel-header p.subheading {
+      margin-top: 6px;
+      max-width: 860px;
+      font-size: 14px;
+    }
+
+    .panel-body {
+      padding: 18px 20px 20px;
+    }
+
+    .meta-label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    /* Split view (same pattern as Order History) */
+    .settings-layout {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.24fr) minmax(0, 0.76fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .settings-list-card {
+      position: sticky;
+      top: 16px;
+      overflow: hidden;
+      border: 1px solid #d5dde7;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
+    }
+
+    .settings-list-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .settings-list-table th {
+      padding: 9px 12px;
+      color: #000;
+      background: var(--table-header-gradient);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: left;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .settings-list-table td {
+      padding: 5px 12px;
+      border-top: 1px solid #dbe3ec;
+      color: #061a33;
+      font-size: 16px;
+      vertical-align: middle;
+    }
+
+    .settings-row {
+      height: 44px;
+      background: #fff;
+      cursor: pointer;
+      transition: background 150ms ease, box-shadow 150ms ease;
+    }
+
+    .settings-row:nth-child(odd) {
+      background: var(--row-alt-gradient);
+    }
+
+    .settings-row:hover,
+    .settings-row:focus-visible {
+      background: var(--row-active-gradient);
+      outline: 0;
+    }
+
+    .settings-row.selected {
+      background: var(--row-active-gradient);
+      box-shadow: inset 4px 0 0 var(--green);
+    }
+
+    .settings-row td:first-child {
+      font-weight: 700;
+    }
+
+    .settings-row.selected td:first-child {
+      color: var(--green-dark);
+    }
+
+    .settings-detail {
+      min-width: 0;
+    }
+
+    .settings-detail .panel:last-child {
+      margin-bottom: 0;
+    }
+
+    .custom-field {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .custom-field input {
+      width: 88px;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 8px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .custom-field input:focus {
+      border-color: rgba(4, 120, 87, 0.65);
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+    }
+
+    .custom-field input[aria-invalid="true"] {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(194, 65, 50, 0.12);
+    }
+
+    .custom-field span {
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .field-error {
+      margin: 8px 0 0;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Actions under the threshold fields */
+    .settings-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .unsaved-flag {
+      min-height: 22px;
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 0 10px;
+      color: var(--amber);
+      background: var(--amber-soft);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    /* Notes */
+    .notes-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .info-note,
+    .warning-note {
+      margin: 0;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+    }
+
+    /* Same look as the Help & Support "Need urgent help?" box: light green shading, filled green "i". */
+    .info-note {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      border: 1px solid var(--line);
+      color: var(--ink);
+      background: linear-gradient(90deg, #f0fdf7 0%, #f8fff9 100%);
+    }
+
+    .info-note::before {
+      content: "i";
+      flex: 0 0 auto;
+      display: inline-grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 999px;
+      color: #ffffff;
+      background: #2e8165;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .warning-note {
+      border: 1px solid var(--amber-line);
+      color: #7c2d12;
+      background: var(--amber-soft);
+      font-weight: 600;
+    }
+
+    /* Data tables */
+    .table-shell {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .data-table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: collapse;
+    }
+
+    .data-table th,
+    .data-table td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+    }
+
+    .data-table th {
+      padding: 9px 12px;
+      color: #000;
+      background: var(--table-header-gradient);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .data-table td {
+      height: 40px;
+      padding: 5px 12px;
+    }
+
+    .data-table tbody tr:nth-child(odd) {
+      background: var(--row-alt-gradient);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    /* Show entries + pagination footer (same as the Out Of Stock page) */
+    .table-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #fff;
+      font-size: 15px;
+    }
+
+    .entries-control {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .entries-control span {
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: none;
+    }
+
+    .entries-control select {
+      width: auto;
+      min-height: 28px;
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 0 24px 0 6px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 13px;
+    }
+
+    .pagination {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .pagination button {
+      min-width: 34px;
+      min-height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #fff;
+      font-weight: 900;
+    }
+
+    .pagination button.active {
+      border-color: var(--green);
+      color: #fff;
+      background: var(--green);
+    }
+
+    /* Confirm dialog extras */
+    .modal-panel {
+      width: min(480px, calc(100vw - 32px));
+    }
+
+    /* Daily Threshold: generic threshold tiles */
+    /* The quantity box is only as wide as its content. */
+    .threshold-fields {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    /* General Limit card: label, number box and "Per item, per day" on one line. */
+    .threshold-field {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 20px;
+      background: #fff;
+      transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+    }
+
+    .threshold-field .meta-label {
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    /* Sized for 4 digits. */
+    .threshold-field .custom-field input.threshold-input {
+      width: 96px;
+      min-height: 46px;
+      height: 46px;
+      font-size: 18px;
+    }
+
+    .threshold-field:focus-within {
+      border-color: var(--green);
+      background: var(--row-active-gradient);
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+    }
+
+    .threshold-field.is-off {
+      opacity: 0.55;
+    }
+
+    /* General threshold on/off switch */
+    .threshold-switch {
+      position: relative;
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .threshold-switch input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+    }
+
+    .switch-track {
+      position: relative;
+      width: 44px;
+      height: 24px;
+      border-radius: 999px;
+      background: #cbd5e1;
+      transition: background-color 160ms ease;
+    }
+
+    .switch-track::after {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.25);
+      transition: transform 160ms ease;
+    }
+
+    .threshold-switch input:checked+.switch-track {
+      background: var(--green);
+    }
+
+    .threshold-switch input:checked+.switch-track::after {
+      transform: translateX(20px);
+    }
+
+    .threshold-switch input:checked~.switch-label {
+      color: var(--green-dark);
+    }
+
+    .threshold-switch input:focus-visible+.switch-track {
+      outline: 2px solid var(--green);
+      outline-offset: 2px;
+    }
+
+    .switch-label {
+      min-width: 28px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .switch-track,
+      .switch-track::after {
+        transition: none;
+      }
+    }
+
+    .field-note {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .custom-field input.threshold-input {
+      width: 96px;
+    }
+
+    /* Quantity threshold boxes: no up/down arrows; the keyboard arrow keys still change them. */
+    #genericQuantity,
+    #productQuantity {
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    #genericQuantity::-webkit-outer-spin-button,
+    #genericQuantity::-webkit-inner-spin-button,
+    #productQuantity::-webkit-outer-spin-button,
+    #productQuantity::-webkit-inner-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+
+    /* "Per item, per day" sits to the right of the quantity box. */
+    .custom-field .field-note {
+      margin-left: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Settings list: Daily Threshold group with its two sub-items */
+    .settings-group-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .settings-group-chevron {
+      flex: 0 0 auto;
+      width: 8px;
+      height: 8px;
+      margin-right: 4px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+    }
+
+    .settings-group.open .settings-group-chevron {
+      transform: rotate(45deg);
+    }
+
+    .settings-group.active td:first-child {
+      color: var(--green-dark);
+    }
+
+    .settings-list-table .settings-subrow td {
+      padding-left: 30px;
+      font-size: 15px;
+    }
+
+    .settings-list-table .settings-subrow td:first-child {
+      font-weight: 700;
+    }
+
+    .threshold-search {
+      position: relative;
+      display: grid;
+      min-width: 260px;
+      max-width: 460px;
+    }
+
+    .threshold-search input {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .threshold-search input:focus {
+      border-color: rgba(4, 120, 87, 0.65);
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+    }
+
+    /* Product search results: same look as the Order Pad search results */
+    .threshold-results {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 25;
+      width: 100%;
+      max-height: 320px;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid rgba(4, 120, 87, 0.22);
+      border-radius: 8px;
+      overflow: auto;
+      background: #fff;
+      box-shadow: 0 16px 34px rgba(15, 23, 42, 0.2);
+    }
+
+    .threshold-results:empty {
+      display: none;
+    }
+
+    .threshold-result {
+      min-height: 42px;
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 0;
+      border-bottom: 1px solid rgba(217, 224, 232, 0.78);
+      padding: 0 14px;
+      color: var(--ink);
+      background: #fff;
+      text-align: left;
+    }
+
+    .threshold-result:last-child {
+      border-bottom: 0;
+    }
+
+    .threshold-result:hover,
+    .threshold-result.active {
+      color: var(--green-dark);
+      background: var(--green-soft);
+    }
+
+    .threshold-result strong {
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .threshold-result span {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .threshold-results-empty {
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .threshold-hint {
+      margin: 10px 0 16px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Product Specific Limit: the Add/Update line is the last line of the table, on one flat light-green tint. */
+    .table-shell.is-adding {
+      overflow: visible;
+    }
+
+    .data-table tbody.threshold-add-line tr,
+    .data-table tbody.threshold-add-line tr:nth-child(odd) {
+      background: #f2fbf6;
+    }
+
+    .threshold-add-line tr:first-child td {
+      border-top: 2px solid rgba(4, 120, 87, 0.28);
+      border-bottom: 0;
+      padding-block: 10px;
+    }
+
+    .data-table.threshold-table .threshold-add-message td {
+      height: auto;
+      padding: 0 12px 10px;
+      white-space: normal;
+    }
+
+    .threshold-add-message .field-error {
+      margin: 0 0 4px;
+    }
+
+    .threshold-add-message .threshold-hint {
+      margin: 0;
+    }
+
+    .threshold-add-line .custom-field input.threshold-input {
+      width: 120px;
+      min-height: 38px;
+      height: 38px;
+    }
+
+    .threshold-editor-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .threshold-editor-actions button {
+      min-height: 38px;
+    }
+
+    /* "+ Add/Update Product" link-style button under the table. */
+    .add-limit-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      border: 0;
+      padding: 4px 0;
+      color: var(--green);
+      background: none;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .add-limit-button svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+    }
+
+    .add-limit-button:not(:disabled):hover,
+    .add-limit-button:focus-visible {
+      text-decoration: underline;
+      outline: 0;
+    }
+
+    .add-limit-button:disabled {
+      color: var(--muted);
+    }
+
+    /* Quantity Limit column: pencil before the value, and the inline editor it opens. */
+    .limit-cell {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .limit-edit-button {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(4, 120, 87, 0.28);
+      border-radius: 6px;
+      padding: 0;
+      color: var(--green);
+      background: var(--green-soft);
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .limit-edit-button:hover,
+    .limit-edit-button:focus-visible {
+      color: #fff;
+      background: var(--green);
+      outline: 0;
+    }
+
+    .limit-inline-editor {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .limit-inline-editor input {
+      width: 72px;
+      height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 6px;
+      color: var(--ink);
+      background: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      -moz-appearance: textfield;
+      appearance: textfield;
+    }
+
+    .limit-inline-editor input::-webkit-outer-spin-button,
+    .limit-inline-editor input::-webkit-inner-spin-button {
+      margin: 0;
+      -webkit-appearance: none;
+    }
+
+    .limit-inline-editor input:focus {
+      border-color: rgba(4, 120, 87, 0.65);
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+    }
+
+    .limit-inline-editor input[aria-invalid="true"] {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(194, 65, 50, 0.12);
+    }
+
+    .limit-inline-save,
+    .limit-inline-cancel {
+      width: 30px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 4px;
+      padding: 0;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .limit-inline-save {
+      background: var(--green);
+    }
+
+    .limit-inline-cancel {
+      background: var(--red);
+    }
+
+    .data-table.threshold-table .limit-error-row td {
+      height: auto;
+      padding: 0 12px 8px;
+      white-space: normal;
+    }
+
+    .limit-error-row .field-error {
+      margin: 0;
+    }
+
+    /* Actions column: one red delete icon per row. */
+    .row-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .delete-icon-button {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid #f3c6c0;
+      border-radius: 6px;
+      padding: 0;
+      color: var(--red);
+      background: var(--red-soft);
+    }
+
+    .delete-icon-button svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .delete-icon-button:hover,
+    .delete-icon-button:focus-visible {
+      border-color: var(--red);
+      color: #fff;
+      background: var(--red);
+      outline: 0;
+    }
+
+    .primary-action.danger {
+      background: var(--red);
+    }
+
+    .threshold-name {
+      min-width: 150px;
+      font-weight: 700;
+    }
+
+    .threshold-table th,
+    .threshold-table td:not(.threshold-name) {
+      white-space: nowrap;
+    }
+
+    .threshold-table td {
+      padding-block: 8px;
+    }
+
+    .changed-date,
+    .changed-by {
+      display: block;
+    }
+
+    .changed-by {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+
+    /* General / Product Specific Threshold: heading and sub-heading on top, then the green-topped panel,
+       the same order and heading size as the Audit Log screen. */
+    .settings-view {
+      display: grid;
+      gap: 14px;
+    }
+
+    .settings-view-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .settings-view-heading h2 {
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    .settings-view-heading .subheading {
+      margin-top: 6px;
+      max-width: 860px;
+      font-size: 14px;
+    }
+
+    /* General Limit: the On/Off switch alone at the top right, inside the panel. */
+    .generic-switch-row {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 6px;
+    }
+
+    /* General Limit: the Quantity Limit card on the left and the buttons on the right, on one centred row. */
+    .generic-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .generic-top-row .settings-actions {
+      position: relative;
+      margin-top: 0;
+    }
+
+    /* "Unsaved Changes" sits under Save Settings without moving the buttons. */
+    .generic-top-row .unsaved-flag {
+      position: absolute;
+      top: calc(100% + 6px);
+      right: 0;
+      white-space: nowrap;
+    }
+
+    .generic-top-row:has(.unsaved-flag:not([hidden])) {
+      margin-bottom: 26px;
+    }
+
+    /* Audit Log: filters, table and paging inside one panel, like Product Specific Threshold. */
+    .audit-panel .panel-body {
+      display: grid;
+      gap: 14px;
+    }
+
+    .audit-panel .audit-toolbar {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+    }
+
+    .audit-panel .table-footer {
+      margin-top: 0;
+    }
+
+    /* Audit Log: heading and sub-heading, then the filters, then the table (same as Out Of Stock) */
+    .audit-view {
+      display: grid;
+      gap: 14px;
+    }
+
+    .audit-heading {
+      display: block;
+    }
+
+    .audit-heading h2 {
+      font-size: 22px;
+      line-height: 1.2;
+    }
+
+    /* Same spacing under the heading as General and Product Specific Threshold. */
+    .audit-heading .subheading {
+      margin-top: 6px;
+      font-size: 14px;
+    }
+
+    .audit-toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.15fr) auto;
+      gap: 22px;
+      align-items: end;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-top: 4px solid var(--green);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 8px 22px rgba(23, 33, 47, 0.07);
+    }
+
+    .audit-toolbar label {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 16px;
+    }
+
+    .audit-toolbar label span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .audit-toolbar input,
+    .audit-toolbar select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 0 12px;
+      color: var(--ink);
+      background: #fff;
+      outline: none;
+    }
+
+    .audit-toolbar input:focus,
+    .audit-toolbar select:focus {
+      border-color: rgba(4, 120, 87, 0.65);
+      box-shadow: 0 0 0 3px rgba(4, 120, 87, 0.12);
+    }
+
+    .audit-toolbar input[type="date"] {
+      cursor: pointer;
+    }
+
+    .audit-toolbar-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .audit-toolbar .icon-button {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border: 0;
+      border-radius: 6px;
+      color: #fff;
+      background: var(--green);
+    }
+
+    .audit-toolbar .icon-button.reset {
+      color: var(--green-dark);
+      border: 1px solid rgba(4, 120, 87, 0.28);
+      background: var(--green-soft);
+    }
+
+    .audit-toolbar .icon-button svg {
+      width: 21px;
+      height: 21px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .audit-table th,
+    .audit-table td {
+      white-space: nowrap;
+    }
+
+    .audit-table .audit-product {
+      white-space: normal;
+      font-weight: 700;
+    }
+
+    .audit-view .threshold-hint {
+      margin: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .settings-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-list-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .panel-header,
+      .settings-view-heading {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .notes-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .table-footer {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .audit-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .audit-toolbar label {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .notes-row {
+        grid-template-columns: 1fr;
+      }
+
+      .panel-header,
+      .panel-body {
+        padding-inline: 14px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="navigation.css" />
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="index.html" aria-label="CASCADE home">
+        <img class="brand-logo" src="logo.png" alt="CASCADE Plus" />
+      </a>
+      <nav class="main-nav" aria-label="Primary">
+        <a href="Dashboard.html">Dashboard</a>
+        <a href="index.html">Order Pad</a>
+        <a href="history.html">Order History</a>
+        <a href="report.html">Reports</a>
+        <a href="help.html">Help</a>
+        <div class="nav-more active">
+          <button class="more-toggle" type="button" aria-haspopup="true" aria-expanded="false">More</button>
+          <div class="more-menu" role="menu">
+            <a href="pending.html" role="menuitem">Pending Order</a>
+            <a href="outofstock.html" role="menuitem">Out Of Stock</a>
+            <a class="active" href="settings.html" role="menuitem">Settings</a>
+          </div>
+        </div>
+      </nav>
+      <div class="account-menu">
+        <button class="profile-button" type="button" aria-haspopup="true" aria-expanded="false">HI, DUMMY1</button>
+        <div class="account-dropdown" role="menu">
+          <button class="account-menu-item" type="button" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 11.5 12 4l9 7.5"></path>
+              <path d="M5.5 10.5V20h13v-9.5"></path>
+              <path d="M9.5 17h5"></path>
+              <path d="M9 14h2"></path>
+              <path d="M13 14h2"></path>
+            </svg>
+            Reset Password
+          </button>
+          <span class="account-menu-separator" aria-hidden="true"></span>
+          <button class="account-menu-item" type="button" role="menuitem">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="7.5" cy="16.5" r="3"></circle>
+              <path d="m10 14 7.5-7.5"></path>
+              <path d="m15.5 8.5 2 2"></path>
+              <path d="m18 6 2 2"></path>
+            </svg>
+            Log Out
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="page-heading" aria-labelledby="pageTitle">
+        <div class="heading-copy">
+          <h1 id="pageTitle">Settings</h1>
+        </div>
+      </section>
+
+      <div class="settings-layout">
+        <div class="settings-list-card">
+          <table class="settings-list-table" aria-label="Settings">
+            <thead>
+              <tr>
+                <th>Options</th>
+              </tr>
+            </thead>
+            <tbody id="settingsList"></tbody>
+          </table>
+        </div>
+
+        <div class="settings-detail">
+          <div id="viewGenericThreshold" class="settings-view">
+            <header class="settings-view-heading">
+              <div>
+                <h2 id="genericThresholdTitle">General Limit</h2>
+                <p class="subheading">Applies to every product that does not have a product-specific limit.</p>
+              </div>
+            </header>
+            <section class="panel accent" aria-labelledby="genericThresholdTitle">
+              <div class="panel-body">
+                <div class="generic-switch-row">
+                  <label class="threshold-switch">
+                    <input id="genericEnabled" type="checkbox" role="switch" aria-label="General limit" />
+                    <span class="switch-track" aria-hidden="true"></span>
+                    <span class="switch-label" id="genericEnabledLabel" aria-hidden="true">On</span>
+                  </label>
+                </div>
+                <div class="generic-top-row">
+                  <div class="threshold-fields">
+                    <label class="threshold-field" id="genericQuantityField">
+                      <span class="meta-label">Quantity limit</span>
+                      <span class="custom-field">
+                        <input class="threshold-input" id="genericQuantity" type="number" min="1" max="9999" step="1"
+                          inputmode="numeric" autocomplete="off" aria-describedby="genericError" />
+                        <span class="field-note">Per item, per day</span>
+                      </span>
+                    </label>
+                  </div>
+                  <div class="settings-actions">
+                    <button class="secondary-action" id="genericDefaults" type="button">Restore Defaults</button>
+                    <button class="secondary-action" id="genericDiscard" type="button" disabled>Discard</button>
+                    <button class="primary-action" id="genericSave" type="button" disabled>Save Settings</button>
+                    <span class="unsaved-flag" id="genericUnsaved" hidden>Unsaved changes</span>
+                  </div>
+                </div>
+                <p class="field-error" id="genericError" role="alert" hidden></p>
+                <p class="threshold-hint" id="genericOffNote" hidden>The general limit is off. Only products with a
+                  product-specific limit show a warning in the Order Pad.</p>
+
+                <div class="notes-row">
+                  <p class="info-note">When an item's quantity for today (orders placed plus the basket) goes above its
+                    limit, its Order Pad line shows a warning sign. Hover over the sign for the details.</p>
+                  <p class="warning-note">The warning never blocks an order. Adding, editing and placing orders work as
+                    before.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div id="viewProductThreshold" class="settings-view" hidden>
+            <header class="settings-view-heading">
+              <div>
+                <h2 id="productThresholdTitle">Product Specific Limit</h2>
+                <p class="subheading">Set a different quantity limit for selected products. It replaces the
+                  general limit for those products, and still applies when the general limit is off.</p>
+              </div>
+            </header>
+            <section class="panel accent" aria-labelledby="productThresholdTitle">
+              <div class="panel-body">
+                <div class="table-shell" id="productThresholdTable">
+                  <table class="data-table threshold-table" aria-label="Product specific limits">
+                    <thead>
+                      <tr>
+                        <th>Product</th>
+                        <th>PIP Code</th>
+                        <th>Quantity Limit</th>
+                        <th>Last Changed</th>
+                        <th><span class="visually-hidden">Actions</span></th>
+                      </tr>
+                    </thead>
+                    <tbody id="productThresholdRows"></tbody>
+                    <!-- Add/Update line: the last line of the table, opened with "+ Add/Update Product". -->
+                    <tbody class="threshold-add-line" id="productAddLine" hidden>
+                      <tr>
+                        <td>
+                          <div class="threshold-search">
+                            <input id="productThresholdSearch" type="search" autocomplete="off" aria-label="Product"
+                              placeholder="Search Product or PIP code..." role="combobox" aria-autocomplete="list"
+                              aria-expanded="false" aria-controls="productThresholdResults" />
+                            <div class="threshold-results" id="productThresholdResults" role="listbox"
+                              aria-label="Matching products"></div>
+                          </div>
+                        </td>
+                        <td id="productAddPip"></td>
+                        <td>
+                          <span class="custom-field" id="productThresholdFields" hidden>
+                            <input class="threshold-input" id="productQuantity" type="number" min="1" step="1"
+                              inputmode="numeric" autocomplete="off" aria-label="Quantity limit"
+                              aria-describedby="productError" />
+                          </span>
+                        </td>
+                        <td colspan="2">
+                          <div class="threshold-editor-actions">
+                            <button class="secondary-action" id="productCancel" type="button">Cancel</button>
+                            <button class="primary-action" id="productSave" type="button" disabled>Save</button>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="threshold-add-message">
+                        <td colspan="5">
+                          <p class="field-error" id="productError" role="alert" hidden></p>
+                          <p class="threshold-hint" id="productHint"></p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button class="add-limit-button" id="productAddButton" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                  </svg>
+                  Add/Update Product
+                </button>
+                <div id="productThresholdFooter"></div>
+              </div>
+            </section>
+          </div>
+
+          <div id="viewAuditThreshold" hidden>
+            <div class="audit-view">
+              <div class="heading-copy audit-heading">
+                <h2 id="auditTitle">General Limit History</h2>
+                <p class="subheading" id="auditSubheading"></p>
+              </div>
+
+              <section class="panel accent audit-panel" aria-labelledby="auditTitle">
+              <div class="panel-body">
+              <div class="audit-toolbar" role="search" aria-label="Filter the history">
+                <label>
+                  <span>Start</span>
+                  <input id="auditStartDate" type="date" lang="en-GB" />
+                </label>
+                <label>
+                  <span>End</span>
+                  <input id="auditEndDate" type="date" lang="en-GB" />
+                </label>
+                <label>
+                  <span>Type</span>
+                  <select id="auditType">
+                    <option value="general">General Limit</option>
+                    <option value="product">Product Specific Limit</option>
+                  </select>
+                </label>
+                <div class="audit-toolbar-actions">
+                  <button class="icon-button" id="auditSearch" type="button" aria-label="Search" title="Search">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle cx="11" cy="11" r="7"></circle>
+                      <path d="m16.5 16.5 4 4"></path>
+                    </svg>
+                  </button>
+                  <button class="icon-button reset" id="auditReset" type="button" aria-label="Reset filters"
+                    title="Reset filters">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M3 12a9 9 0 1 0 3-6.7"></path>
+                      <path d="M3 4v5h5"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p class="field-error" id="auditError" role="alert" hidden>The start date must be on or before the end date.</p>
+
+              <div class="table-shell">
+                <table class="data-table audit-table" aria-labelledby="auditTitle">
+                  <thead id="auditHead"></thead>
+                  <tbody id="auditRows"></tbody>
+                </table>
+              </div>
+              <div id="auditFooter"></div>
+              <p class="threshold-hint">History entries are added automatically when a limit is saved or removed. They
+                cannot be edited or deleted.</p>
+              </div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="site-footer">© 2019-2026 Cascade Plus. All rights reserved. Powered by LuxshTech.</footer>
+    </main>
+  </div>
+
+  <dialog id="removeThresholdDialog">
+    <section class="modal-panel" aria-labelledby="removeThresholdTitle">
+      <header class="modal-header">
+        <div>
+          <p class="eyebrow">Product Specific Limit</p>
+          <h2 id="removeThresholdTitle">Remove limit?</h2>
+        </div>
+      </header>
+      <div class="modal-body">
+        <div class="warning-icon" aria-hidden="true">!</div>
+        <p class="subheading" id="removeThresholdMessage"></p>
+      </div>
+      <footer class="modal-footer">
+        <button class="secondary-action" type="button" data-close-remove>Cancel</button>
+        <button class="primary-action danger" id="confirmRemoveThreshold" type="button">Remove</button>
+      </footer>
+    </section>
+  </dialog>
+
+  <div class="toast-region" id="toastRegion" aria-live="polite"></div>
+
+  <script src="account-menu.js"></script>
+  <script src="daily-threshold.js"></script>
+  <script src="order-pad-catalogue.js"></script>
+  <script src="orderhistory-data.js"></script>
+  <script>
+    (function initSettingsPage() {
+      const threshold = window.CascadeDailyThreshold;
+
+      const state = {
+        view: "thresholdGeneric",
+        // Daily Threshold: unsaved general on/off and quantity as typed, and the product-specific editor.
+        genericDraft: { enabled: true, quantity: "" },
+        productPage: 1,
+        productPageSize: 10,
+        // Settings list groups whose sub-items are shown: only the group holding the open item
+        // (Smart Quantity Recommendations when the page opens); the other group is minimised.
+        openGroups: { threshold: true, audit: false },
+        editor: null,
+        // Pencil edit of one product's quantity in the table: { pip, quantity } or null.
+        rowEdit: null,
+        removePip: null,
+        // Audit Log filters and paging.
+        audit: null,
+        auditPage: 1,
+        auditPageSize: 10
+      };
+
+      const els = {
+        settingsList: document.querySelector("#settingsList"),
+        toastRegion: document.querySelector("#toastRegion"),
+        viewGenericThreshold: document.querySelector("#viewGenericThreshold"),
+        viewProductThreshold: document.querySelector("#viewProductThreshold"),
+        genericEnabled: document.querySelector("#genericEnabled"),
+        genericEnabledLabel: document.querySelector("#genericEnabledLabel"),
+        genericQuantityField: document.querySelector("#genericQuantityField"),
+        genericQuantity: document.querySelector("#genericQuantity"),
+        genericError: document.querySelector("#genericError"),
+        genericOffNote: document.querySelector("#genericOffNote"),
+        genericUnsaved: document.querySelector("#genericUnsaved"),
+        genericDefaults: document.querySelector("#genericDefaults"),
+        genericDiscard: document.querySelector("#genericDiscard"),
+        genericSave: document.querySelector("#genericSave"),
+        productSearch: document.querySelector("#productThresholdSearch"),
+        productResults: document.querySelector("#productThresholdResults"),
+        productFields: document.querySelector("#productThresholdFields"),
+        productQuantity: document.querySelector("#productQuantity"),
+        productSave: document.querySelector("#productSave"),
+        productCancel: document.querySelector("#productCancel"),
+        productError: document.querySelector("#productError"),
+        productHint: document.querySelector("#productHint"),
+        productRows: document.querySelector("#productThresholdRows"),
+        productTable: document.querySelector("#productThresholdTable"),
+        productAddLine: document.querySelector("#productAddLine"),
+        productAddPip: document.querySelector("#productAddPip"),
+        productAddButton: document.querySelector("#productAddButton"),
+        productFooter: document.querySelector("#productThresholdFooter"),
+        removeDialog: document.querySelector("#removeThresholdDialog"),
+        removeMessage: document.querySelector("#removeThresholdMessage"),
+        confirmRemove: document.querySelector("#confirmRemoveThreshold"),
+        viewAuditThreshold: document.querySelector("#viewAuditThreshold"),
+        auditTitle: document.querySelector("#auditTitle"),
+        auditSubheading: document.querySelector("#auditSubheading"),
+        auditStartDate: document.querySelector("#auditStartDate"),
+        auditEndDate: document.querySelector("#auditEndDate"),
+        auditType: document.querySelector("#auditType"),
+        auditSearch: document.querySelector("#auditSearch"),
+        auditReset: document.querySelector("#auditReset"),
+        auditError: document.querySelector("#auditError"),
+        auditHead: document.querySelector("#auditHead"),
+        auditRows: document.querySelector("#auditRows"),
+        auditFooter: document.querySelector("#auditFooter")
+      };
+
+      // The operator signed in through Shift sign-in (account-menu.js).
+      function currentUser() {
+        try {
+          return window.sessionStorage.getItem("cascade.activeUser") || "Not recorded";
+        } catch (error) {
+          return "Not recorded";
+        }
+      }
+
+      function timestamp() {
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${pad(now.getDate())}-${pad(now.getMonth() + 1)}-${now.getFullYear()} - ${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+      }
+
+      // Settings list groups. Selecting a group opens its first sub-item and shows its sub-items.
+      const SETTINGS_GROUPS = [
+        {
+          key: "threshold",
+          label: "Smart Quantity Recommendations",
+          children: [
+            { view: "thresholdGeneric", label: "General Limit" },
+            { view: "thresholdProduct", label: "Product Specific Limit" }
+          ]
+        },
+        {
+          key: "audit",
+          label: "Audit Log",
+          children: [
+            { view: "auditThreshold", label: "Smart Quantity Recommendations" }
+          ]
+        }
+      ];
+
+      function renderList() {
+        const row = (item, extraClass = "") => {
+          const selected = !item.children && item.view === state.view;
+          return `
+            <tr class="settings-row ${extraClass} ${selected ? "selected" : ""}" data-view="${item.view}" tabindex="0" role="button" aria-pressed="${selected}">
+              <td>${item.label}</td>
+            </tr>
+          `;
+        };
+        els.settingsList.innerHTML = SETTINGS_GROUPS.map((group) => {
+          const open = state.openGroups[group.key];
+          const active = group.children.some((child) => child.view === state.view);
+          return `
+            <tr class="settings-row settings-group ${open ? "open" : ""} ${active ? "active" : ""}" data-view="${group.children[0].view}" data-group="${group.key}" tabindex="0" role="button" aria-expanded="${open}">
+              <td><span class="settings-group-label">${group.label}<span class="settings-group-chevron" aria-hidden="true"></span></span></td>
+            </tr>
+            ${open ? group.children.map((child) => row(child, "settings-subrow")).join("") : ""}
+          `;
+        }).join("");
+        els.viewGenericThreshold.hidden = state.view !== "thresholdGeneric";
+        els.viewProductThreshold.hidden = state.view !== "thresholdProduct";
+        els.viewAuditThreshold.hidden = state.view !== "auditThreshold";
+      }
+
+      // Same Show entries / pagination footer as the Out Of Stock page.
+      function renderTableFooter(totalCount, currentPage, pageCount, label, pageSize) {
+        const start = (currentPage - 1) * pageSize + 1;
+        const end = Math.min(totalCount, currentPage * pageSize);
+        const buttons = Array.from({ length: pageCount }, (_, index) => {
+          const page = index + 1;
+          return `<button class="${page === currentPage ? "active" : ""}" type="button" data-page="${page}" aria-label="Go to page ${page}">${page}</button>`;
+        }).join("");
+        return `
+          <div class="table-footer">
+            <label class="entries-control">
+              <span>Show</span>
+              <select data-page-size aria-label="Rows per page">
+                ${[10, 25, 50, 100].map((size) => `<option value="${size}" ${size === pageSize ? "selected" : ""}>${size}</option>`).join("")}
+              </select>
+              <span>entries</span>
+            </label>
+            <span>Showing ${start} to ${end} of ${totalCount} ${label}</span>
+            <nav class="pagination" aria-label="Pagination">
+              <button type="button" data-page="${Math.max(1, currentPage - 1)}" ${currentPage === 1 ? "disabled" : ""} aria-label="Previous page">&lsaquo;</button>
+              ${buttons}
+              <button type="button" data-page="${Math.min(pageCount, currentPage + 1)}" ${currentPage === pageCount ? "disabled" : ""} aria-label="Next page">&rsaquo;</button>
+            </nav>
+          </div>
+        `;
+      }
+
+      /* ---------- Daily Threshold ---------- */
+      function escapeHtml(value) {
+        return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
+      }
+
+      // Products that can be in the Order Basket: the Order Pad catalogue plus Order History products (Quick Order).
+      const thresholdProducts = (() => {
+        const byPip = new Map();
+        (window.CascadeOrderPadCatalogue?.catalogue || []).forEach((product) => {
+          const pip = String(product.pip || "").trim();
+          if (pip && !byPip.has(pip)) byPip.set(pip, { pip, name: product.name });
+        });
+        (window.orderHistoryData || []).forEach((order) => (order.products || []).forEach((product) => {
+          const pip = String(product.pip || "").trim();
+          if (pip && !byPip.has(pip)) byPip.set(pip, { pip, name: String(product.description || `Product ${pip}`) });
+        }));
+        return Array.from(byPip.values()).sort((a, b) => a.name.localeCompare(b.name));
+      })();
+
+      const QUANTITY_ERROR = "Enter a quantity limit of 1 or more in natural numbers.";
+
+      // Returns the number when the text is a valid threshold, or null.
+      function parseQuantity(text) {
+        const value = Number(text);
+        return String(text).trim() !== "" && threshold.isValidQuantity(value) ? value : null;
+      }
+
+      function setFieldValue(input, value) {
+        if (input.value !== value) input.value = value;
+      }
+
+      function resetGenericDraft() {
+        const saved = threshold.getGeneric();
+        state.genericDraft = { enabled: saved.enabled, quantity: String(saved.quantity) };
+      }
+
+      // lineOpen: the Add/Update line is shown in the table; open: its search results are shown.
+      function emptyEditor(lineOpen = false) {
+        return { pip: null, name: "", query: "", quantity: "", exists: false, open: false, activeIndex: 0, lineOpen };
+      }
+
+      // While the general threshold is off its quantity is kept but cannot be edited, and no product
+      // shows a warning unless it has a product-specific threshold.
+      function renderGenericThreshold() {
+        const saved = threshold.getGeneric();
+        const draft = state.genericDraft;
+        els.genericEnabled.checked = draft.enabled;
+        els.genericEnabledLabel.textContent = draft.enabled ? "On" : "Off";
+        setFieldValue(els.genericQuantity, draft.quantity);
+        els.genericQuantity.disabled = !draft.enabled;
+        els.genericQuantityField.classList.toggle("is-off", !draft.enabled);
+        els.genericOffNote.hidden = draft.enabled;
+
+        const quantity = parseQuantity(draft.quantity);
+        const invalid = draft.enabled && quantity === null;
+        els.genericError.hidden = !invalid;
+        els.genericError.textContent = invalid ? QUANTITY_ERROR : "";
+        els.genericQuantity.setAttribute("aria-invalid", String(invalid));
+
+        const dirty = draft.enabled !== saved.enabled || (draft.enabled && quantity !== saved.quantity);
+        els.genericUnsaved.hidden = !dirty;
+        els.genericDiscard.disabled = !dirty;
+        els.genericSave.disabled = !dirty || invalid;
+        els.genericDefaults.disabled = draft.enabled && quantity === threshold.DEFAULT_QUANTITY;
+      }
+
+      function productMatches() {
+        const query = state.editor.query.trim().toLowerCase();
+        if (!query || state.editor.pip) return [];
+        return thresholdProducts
+          .filter((product) => product.name.toLowerCase().includes(query) || product.pip.toLowerCase().includes(query))
+          .slice(0, 12);
+      }
+
+      function renderProductEditor() {
+        const editor = state.editor;
+        els.productAddLine.hidden = !editor.lineOpen;
+        els.productAddButton.disabled = editor.lineOpen;
+        // While the line is open its results list can hang below the table.
+        els.productTable.classList.toggle("is-adding", editor.lineOpen);
+        els.productAddPip.textContent = editor.pip || "";
+        const matches = productMatches();
+        editor.activeIndex = Math.min(editor.activeIndex, Math.max(0, matches.length - 1));
+        setFieldValue(els.productSearch, editor.pip ? editor.name : editor.query);
+
+        const showResults = editor.open && !editor.pip && editor.query.trim() !== "";
+        els.productResults.innerHTML = !showResults
+          ? ""
+          : matches.length
+            ? matches.map((product, index) => `
+                <button class="threshold-result ${index === editor.activeIndex ? "active" : ""}" type="button" role="option" id="thresholdOption${index}"
+                  aria-selected="${index === editor.activeIndex}" data-threshold-product="${escapeHtml(product.pip)}">
+                  <strong>${escapeHtml(product.name)}</strong>
+                  <span>PIP ${escapeHtml(product.pip)}</span>
+                </button>
+              `).join("")
+            : `<div class="threshold-results-empty">No products found. Try another product name or PIP code.</div>`;
+        const listOpen = matches.length > 0 && showResults;
+        els.productSearch.setAttribute("aria-expanded", String(listOpen));
+        if (listOpen) els.productSearch.setAttribute("aria-activedescendant", `thresholdOption${editor.activeIndex}`);
+        else els.productSearch.removeAttribute("aria-activedescendant");
+
+        els.productFields.hidden = !editor.pip;
+        if (!editor.pip) {
+          els.productError.hidden = true;
+          els.productSave.disabled = true;
+          els.productSave.textContent = "Save";
+          els.productHint.textContent = "Type a product name or PIP code, then choose the product to set its own limit.";
+          return;
+        }
+
+        setFieldValue(els.productQuantity, editor.quantity);
+        const invalid = parseQuantity(editor.quantity) === null;
+        els.productError.hidden = !invalid;
+        els.productError.textContent = invalid ? QUANTITY_ERROR : "";
+        els.productQuantity.setAttribute("aria-invalid", String(invalid));
+        els.productSave.disabled = invalid;
+        els.productSave.textContent = editor.exists ? "Update" : "Save";
+        const generic = threshold.getGeneric();
+        els.productHint.textContent = editor.exists
+          ? `${editor.name} already has its own limit. Change it and select Update, or Cancel.`
+          : generic.enabled
+            ? `Prefilled with the general limit (${generic.quantity}). If needed, change it, then save it.`
+            : `Prefilled with ${generic.quantity}. The general limit is off, so only products listed below show a warning.`;
+      }
+
+      const TRASH_SVG = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"></path><path d="M9 7V4h6v3"></path></svg>`;
+
+      // Quantity Limit cell: the pencil and value, or the inline editor while that row is being edited.
+      function limitCellTemplate(entry) {
+        const edit = state.rowEdit;
+        if (edit && edit.pip === entry.pip) {
+          const invalid = parseQuantity(edit.quantity) === null;
+          return `
+            <span class="limit-inline-editor">
+              <input type="number" min="1" step="1" inputmode="numeric" autocomplete="off" data-limit-input
+                value="${escapeHtml(edit.quantity)}" aria-label="Quantity limit for ${escapeHtml(entry.name)}"
+                aria-invalid="${invalid}" aria-describedby="limitRowError" />
+              <button class="limit-inline-save" type="button" data-save-limit aria-label="Save quantity limit" title="Save" ${invalid ? "disabled" : ""}>&#10003;</button>
+              <button class="limit-inline-cancel" type="button" data-cancel-limit aria-label="Cancel" title="Cancel">&times;</button>
+            </span>
+          `;
+        }
+        return `
+          <span class="limit-cell">
+            <button class="limit-edit-button" type="button" data-edit-limit="${escapeHtml(entry.pip)}" title="Edit quantity limit" aria-label="Edit quantity limit for ${escapeHtml(entry.name)}">&#9998;</button>
+            <span>${entry.quantity}</span>
+          </span>
+        `;
+      }
+
+      // Under the product being edited: the error for an invalid quantity.
+      function limitErrorRowTemplate(entry) {
+        const edit = state.rowEdit;
+        if (!edit || edit.pip !== entry.pip) return "";
+        const invalid = parseQuantity(edit.quantity) === null;
+        return `<tr class="limit-error-row"><td colspan="5"><p class="field-error" id="limitRowError" role="alert" ${invalid ? "" : "hidden"}>${QUANTITY_ERROR}</p></td></tr>`;
+      }
+
+      // Newest first: each save (add or update) moves the product to the end of the stored list.
+      function sortedProductThresholds() {
+        return threshold.getProductThresholds().reverse();
+      }
+
+      function renderProductThresholds() {
+        const list = sortedProductThresholds();
+        const pageCount = Math.max(1, Math.ceil(list.length / state.productPageSize));
+        state.productPage = Math.min(state.productPage, pageCount);
+        const start = (state.productPage - 1) * state.productPageSize;
+        const pageRows = list.slice(start, start + state.productPageSize);
+        els.productFooter.innerHTML = list.length
+          ? renderTableFooter(list.length, state.productPage, pageCount, "products", state.productPageSize)
+          : "";
+        els.productRows.innerHTML = list.length
+          ? pageRows.map((entry) => `
+              <tr>
+                <td class="threshold-name">${escapeHtml(entry.name)}</td>
+                <td>${escapeHtml(entry.pip)}</td>
+                <td>${limitCellTemplate(entry)}</td>
+                <td>
+                  <span class="changed-date">${escapeHtml(entry.updatedAt || "")}</span>
+                  <span class="changed-by">by ${escapeHtml(entry.updatedBy || "Not recorded")}</span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button class="delete-icon-button" type="button" data-remove-threshold="${escapeHtml(entry.pip)}" aria-label="Remove limit for ${escapeHtml(entry.name)}" title="Remove">${TRASH_SVG}</button>
+                  </div>
+                </td>
+              </tr>
+              ${limitErrorRowTemplate(entry)}
+            `).join("")
+          : threshold.getGeneric().enabled
+            ? `<tr><td colspan="5">No product-specific limits yet. Every product uses the general limit.</td></tr>`
+            : `<tr><td colspan="5">No product-specific limits yet. The general limit is off, so no product shows a warning.</td></tr>`;
+      }
+
+      function renderThreshold() {
+        renderGenericThreshold();
+        renderProductThresholds();
+        renderProductEditor();
+      }
+
+      // Turning the general threshold off keeps its last valid quantity for when it is turned back on.
+      function saveGenericThreshold() {
+        const { enabled } = state.genericDraft;
+        const quantity = parseQuantity(state.genericDraft.quantity);
+        if (enabled && quantity === null) return;
+        const before = threshold.getGeneric();
+        const saved = { enabled, quantity: quantity ?? before.quantity };
+        threshold.setGeneric(saved);
+        const actions = [];
+        if (saved.enabled !== before.enabled) actions.push(saved.enabled ? "on" : "off");
+        if (saved.quantity !== before.quantity) actions.push("quantity");
+        if (actions.length) recordHistory({ type: "general", actions, enabled: saved.enabled, quantity: saved.quantity });
+        resetGenericDraft();
+        render();
+        toast(enabled
+          ? `General limit saved: ${quantity} per item, per day`
+          : "General limit turned off. Only products with their own limit show a warning");
+      }
+
+      // Choosing a product shows its quantity box, prefilled with its own threshold or the general one.
+      function selectThresholdProduct(pip) {
+        const existing = threshold.getProductThreshold(pip);
+        const product = thresholdProducts.find((item) => item.pip === pip) || existing;
+        if (!product) return;
+        const start = existing || threshold.getGeneric();
+        state.editor = {
+          ...emptyEditor(true),
+          pip,
+          name: product.name,
+          query: product.name,
+          quantity: String(start.quantity),
+          exists: Boolean(existing)
+        };
+        renderProductEditor();
+        els.productQuantity.focus();
+        els.productQuantity.select();
+      }
+
+      function saveProductThreshold() {
+        const editor = state.editor;
+        const quantity = parseQuantity(editor.quantity);
+        if (!editor.pip || quantity === null) return;
+        const existing = threshold.getProductThreshold(editor.pip);
+        threshold.setProductThreshold({ pip: editor.pip, name: editor.name, quantity, updatedAt: timestamp(), updatedBy: currentUser() });
+        if (!existing || existing.quantity !== quantity) {
+          recordHistory({ type: "product", action: existing ? "updated" : "added", pip: editor.pip, name: editor.name, quantity });
+        }
+        // Show the page that holds the saved product.
+        const index = sortedProductThresholds().findIndex((entry) => entry.pip === editor.pip);
+        state.productPage = Math.floor(Math.max(0, index) / state.productPageSize) + 1;
+        toast(`${editor.exists ? "Limit updated" : "Limit saved"} for ${editor.name}: ${quantity}`);
+        state.editor = emptyEditor();
+        render();
+        els.productAddButton.focus();
+      }
+
+      // Opens the Add/Update line as the last line of the table (closing any pencil edit).
+      function openAddLine() {
+        state.rowEdit = null;
+        state.editor = emptyEditor(true);
+        renderProductThresholds();
+        renderProductEditor();
+        els.productSearch.focus();
+      }
+
+      function closeAddLine() {
+        state.editor = emptyEditor();
+        renderProductEditor();
+        els.productAddButton.focus();
+      }
+
+      function focusLimitPencil(pip) {
+        els.productRows.querySelector(`[data-edit-limit="${CSS.escape(pip)}"]`)?.focus();
+      }
+
+      // Pencil: edit one product's quantity in its row (closing the Add/Update line or another row's edit).
+      function openRowEdit(pip) {
+        const entry = threshold.getProductThreshold(pip);
+        if (!entry) return;
+        state.editor = emptyEditor();
+        state.rowEdit = { pip, quantity: String(entry.quantity) };
+        renderProductThresholds();
+        renderProductEditor();
+        const input = els.productRows.querySelector("[data-limit-input]");
+        input?.focus();
+        input?.select();
+      }
+
+      function cancelRowEdit() {
+        const pip = state.rowEdit?.pip;
+        state.rowEdit = null;
+        renderProductThresholds();
+        if (pip) focusLimitPencil(pip);
+      }
+
+      // Updates the box, ✓ and the error while typing, without re-rendering the table, so the box keeps focus.
+      function updateRowEditState(input) {
+        state.rowEdit.quantity = input.value;
+        const invalid = parseQuantity(input.value) === null;
+        input.setAttribute("aria-invalid", String(invalid));
+        const save = els.productRows.querySelector("[data-save-limit]");
+        if (save) save.disabled = invalid;
+        const error = els.productRows.querySelector("#limitRowError");
+        if (error) error.hidden = !invalid;
+      }
+
+      // A different value is saved as an update (newest first, page 1); the same value just closes the editor.
+      function saveRowEdit() {
+        const edit = state.rowEdit;
+        const entry = edit && threshold.getProductThreshold(edit.pip);
+        const quantity = edit ? parseQuantity(edit.quantity) : null;
+        if (!entry || quantity === null) return;
+        state.rowEdit = null;
+        if (quantity !== entry.quantity) {
+          threshold.setProductThreshold({ ...entry, quantity, updatedAt: timestamp(), updatedBy: currentUser() });
+          recordHistory({ type: "product", action: "updated", pip: entry.pip, name: entry.name, quantity });
+          state.productPage = 1;
+          toast(`Limit updated for ${entry.name}: ${quantity}`);
+        }
+        renderProductThresholds();
+        focusLimitPencil(entry.pip);
+      }
+
+      function openRemoveThreshold(pip) {
+        const entry = threshold.getProductThreshold(pip);
+        if (!entry) return;
+        state.removePip = pip;
+        els.removeMessage.textContent = `${entry.name} will use the general limit again, if it is on.`;
+        els.removeDialog.showModal();
+      }
+
+      function removeThreshold() {
+        const entry = threshold.getProductThreshold(state.removePip);
+        els.removeDialog.close();
+        if (!entry) return;
+        threshold.removeProductThreshold(entry.pip);
+        recordHistory({ type: "product", action: "removed", pip: entry.pip, name: entry.name, quantity: entry.quantity });
+        if (state.editor.pip === entry.pip) state.editor = emptyEditor();
+        if (state.rowEdit?.pip === entry.pip) state.rowEdit = null;
+        state.removePip = null;
+        render();
+        toast(threshold.getGeneric().enabled
+          ? `${entry.name} now uses the general limit`
+          : `Limit removed for ${entry.name}`);
+      }
+
+      /* ---------- Audit Log: Daily Quantity Threshold ---------- */
+      const AUDIT_ACTIONS = {
+        on: "Switched On",
+        off: "Switched Off",
+        quantity: "Quantity Changed",
+        added: "Added",
+        updated: "Updated",
+        removed: "Removed"
+      };
+
+      const AUDIT_TYPES = {
+        general: {
+          title: "General Limit History",
+          subheading: "Every time the general limit was switched on or off, or its quantity changed. Newest first.",
+          head: "<tr><th>Date &amp; Time</th><th>Changed By</th><th>Action</th><th>Status</th><th>Quantity Limit</th></tr>"
+        },
+        product: {
+          title: "Product Specific Limit History",
+          subheading: "Every product-specific limit that was added, updated or removed. Newest first.",
+          head: "<tr><th>Date &amp; Time</th><th>Changed By</th><th>Action</th><th>Product</th><th>Quantity Limit</th></tr>"
+        }
+      };
+
+      function isoDay(date) {
+        const pad = (n) => String(n).padStart(2, "0");
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      }
+
+      // The filters open on the last 7 days, General Threshold.
+      function defaultAuditFilters() {
+        const start = new Date();
+        start.setDate(start.getDate() - 6);
+        return { start: isoDay(start), end: isoDay(new Date()), type: "general" };
+      }
+
+      // Every saved change gets the date, time and the operator signed in through Shift sign-in.
+      function recordHistory(entry) {
+        const now = new Date();
+        threshold.addHistory({ ...entry, at: now.getTime(), day: isoDay(now), when: timestamp(), user: currentUser() });
+      }
+
+      function auditRowTemplate(entry, type) {
+        if (type === "general") {
+          return `
+            <tr>
+              <td>${escapeHtml(entry.when)}</td>
+              <td>${escapeHtml(entry.user)}</td>
+              <td>${(entry.actions || []).map((action) => AUDIT_ACTIONS[action] || action).join(", ")}</td>
+              <td>${entry.enabled ? "On" : "Off"}</td>
+              <td>${entry.quantity}</td>
+            </tr>
+          `;
+        }
+        return `
+          <tr>
+            <td>${escapeHtml(entry.when)}</td>
+            <td>${escapeHtml(entry.user)}</td>
+            <td>${AUDIT_ACTIONS[entry.action] || escapeHtml(entry.action)}</td>
+            <td class="audit-product">${escapeHtml(entry.name)}</td>
+            <td>${entry.quantity}</td>
+          </tr>
+        `;
+      }
+
+      // Back to the default filters (last 7 days, General Threshold), shown in the filter boxes.
+      function resetAuditFilters() {
+        state.audit = defaultAuditFilters();
+        state.auditPage = 1;
+        setFieldValue(els.auditStartDate, state.audit.start);
+        setFieldValue(els.auditEndDate, state.audit.end);
+        els.auditType.value = state.audit.type;
+        els.auditError.hidden = true;
+      }
+
+      // Shows the history for the filters last applied with Search (or the defaults). Changing a filter box
+      // does not change the table until Search is selected.
+      function renderAudit() {
+        const filters = state.audit;
+        const type = AUDIT_TYPES[filters.type];
+        els.auditTitle.textContent = type.title;
+        els.auditSubheading.textContent = type.subheading;
+        els.auditHead.innerHTML = type.head;
+
+        const rows = threshold.getHistory()
+          .filter((entry) => entry.type === filters.type
+            && (!filters.start || entry.day >= filters.start)
+            && (!filters.end || entry.day <= filters.end))
+          .sort((a, b) => b.at - a.at);
+
+        const pageCount = Math.max(1, Math.ceil(rows.length / state.auditPageSize));
+        state.auditPage = Math.min(state.auditPage, pageCount);
+        const start = (state.auditPage - 1) * state.auditPageSize;
+        els.auditRows.innerHTML = rows.length
+          ? rows.slice(start, start + state.auditPageSize).map((entry) => auditRowTemplate(entry, filters.type)).join("")
+          : `<tr><td colspan="5">No changes found for the selected dates.</td></tr>`;
+        els.auditFooter.innerHTML = rows.length
+          ? renderTableFooter(rows.length, state.auditPage, pageCount, "changes", state.auditPageSize)
+          : "";
+      }
+
+      function openDatePicker(input) {
+        if (typeof input.showPicker === "function") {
+          try {
+            input.showPicker();
+          } catch (error) {
+            // Some browsers only allow showPicker during direct user activation.
+          }
+        }
+      }
+
+      function render() {
+        renderList();
+        renderThreshold();
+        renderAudit();
+      }
+
+      function toast(message) {
+        const node = document.createElement("div");
+        node.className = "toast";
+        node.textContent = message;
+        els.toastRegion.appendChild(node);
+        window.setTimeout(() => {
+          node.style.opacity = "0";
+          node.style.transform = "translateY(-8px)";
+          window.setTimeout(() => node.remove(), 180);
+        }, 2600);
+      }
+
+      // Unsaved changes are dropped when another item is opened, so each item comes back showing its saved setting.
+      function showView(view) {
+        if (view === state.view) return;
+        state.view = view;
+        // Only the group that holds the open item shows its sub-items; the other group is minimised.
+        SETTINGS_GROUPS.forEach((group) => {
+          state.openGroups[group.key] = group.children.some((child) => child.view === view);
+        });
+        resetGenericDraft();
+        state.editor = emptyEditor();
+        state.rowEdit = null;
+        // The Audit Log always opens on the default filters.
+        if (view === "auditThreshold") resetAuditFilters();
+        render();
+      }
+
+      // A group opens its first sub-item with its sub-items shown; clicking it again while one of its
+      // pages is open hides or shows the sub-items and keeps that page.
+      function toggleGroup(key) {
+        const group = SETTINGS_GROUPS.find((item) => item.key === key);
+        if (!group) return;
+        if (group.children.some((child) => child.view === state.view)) {
+          state.openGroups[key] = !state.openGroups[key];
+          renderList();
+          return;
+        }
+        showView(group.children[0].view);
+      }
+
+      function selectListRow(row) {
+        if (row.classList.contains("settings-group")) toggleGroup(row.dataset.group);
+        else showView(row.dataset.view);
+      }
+
+      els.settingsList.addEventListener("click", (event) => {
+        const row = event.target.closest("[data-view]");
+        if (!row) return;
+        selectListRow(row);
+      });
+
+      els.settingsList.addEventListener("keydown", (event) => {
+        const row = event.target.closest("[data-view]");
+        if (!row || (event.key !== "Enter" && event.key !== " ")) return;
+        event.preventDefault();
+        const isGroup = row.classList.contains("settings-group");
+        const groupKey = row.dataset.group;
+        selectListRow(row);
+        els.settingsList.querySelector(isGroup ? `.settings-group[data-group="${groupKey}"]` : ".settings-row.selected")?.focus();
+      });
+
+      // Returning with the browser's Back/Forward can restore this page as it was left;
+      // show the saved setting instead of any unsaved entry.
+      window.addEventListener("pageshow", (event) => {
+        if (!event.persisted) return;
+        resetGenericDraft();
+        state.editor = emptyEditor();
+        state.rowEdit = null;
+        resetAuditFilters();
+        render();
+      });
+
+      // Audit Log: Start, End and Type are applied together when Search is selected.
+      [els.auditStartDate, els.auditEndDate].forEach((input) => {
+        input.addEventListener("click", () => openDatePicker(input));
+      });
+
+      els.auditSearch.addEventListener("click", () => {
+        const filters = { start: els.auditStartDate.value, end: els.auditEndDate.value, type: els.auditType.value };
+        const invalid = Boolean(filters.start && filters.end && filters.start > filters.end);
+        els.auditError.hidden = !invalid;
+        if (invalid) return;
+        state.audit = filters;
+        state.auditPage = 1;
+        renderAudit();
+      });
+
+      els.auditReset.addEventListener("click", () => {
+        resetAuditFilters();
+        renderAudit();
+        toast("Filters reset");
+      });
+
+      els.auditFooter.addEventListener("click", (event) => {
+        const pageButton = event.target.closest("[data-page]");
+        if (!pageButton || pageButton.disabled) return;
+        state.auditPage = Number(pageButton.dataset.page);
+        renderAudit();
+      });
+
+      els.auditFooter.addEventListener("change", (event) => {
+        if (!event.target.matches("[data-page-size]")) return;
+        state.auditPageSize = Number(event.target.value);
+        state.auditPage = 1;
+        renderAudit();
+      });
+
+      // Daily Threshold: generic threshold
+      els.genericEnabled.addEventListener("change", () => {
+        state.genericDraft.enabled = els.genericEnabled.checked;
+        renderGenericThreshold();
+      });
+
+      // The box takes up to 4 digits; if 5 or more are entered, the first 4 are kept.
+      els.genericQuantity.addEventListener("input", () => {
+        if (/^\d{5,}$/.test(els.genericQuantity.value)) els.genericQuantity.value = els.genericQuantity.value.slice(0, 4);
+        state.genericDraft.quantity = els.genericQuantity.value;
+        renderGenericThreshold();
+      });
+
+      els.genericQuantity.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !els.genericSave.disabled) {
+          event.preventDefault();
+          saveGenericThreshold();
+        }
+      });
+
+      els.genericDefaults.addEventListener("click", () => {
+        state.genericDraft = { enabled: true, quantity: String(threshold.DEFAULT_QUANTITY) };
+        renderGenericThreshold();
+      });
+
+      els.genericDiscard.addEventListener("click", () => {
+        resetGenericDraft();
+        renderGenericThreshold();
+        toast("Changes discarded");
+      });
+
+      els.genericSave.addEventListener("click", saveGenericThreshold);
+
+      // Daily Threshold: product-specific thresholds
+      els.productAddButton.addEventListener("click", openAddLine);
+
+      els.productSearch.addEventListener("input", () => {
+        state.editor = { ...emptyEditor(true), query: els.productSearch.value, open: true };
+        renderProductEditor();
+      });
+
+      els.productSearch.addEventListener("focus", () => {
+        if (state.editor.pip) return;
+        state.editor.open = true;
+        renderProductEditor();
+      });
+
+      els.productSearch.addEventListener("keydown", (event) => {
+        const matches = productMatches();
+        // Escape closes the results first, then the line.
+        if (event.key === "Escape") {
+          event.preventDefault();
+          if (state.editor.open && state.editor.query.trim() !== "" && !state.editor.pip) {
+            state.editor.open = false;
+            renderProductEditor();
+          } else {
+            closeAddLine();
+          }
+          return;
+        }
+        if (!matches.length || !state.editor.open) return;
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          const step = event.key === "ArrowDown" ? 1 : -1;
+          state.editor.activeIndex = (state.editor.activeIndex + step + matches.length) % matches.length;
+          renderProductEditor();
+          els.productResults.querySelector(".threshold-result.active")?.scrollIntoView({ block: "nearest" });
+        }
+        if (event.key === "Enter") {
+          event.preventDefault();
+          selectThresholdProduct(matches[state.editor.activeIndex].pip);
+        }
+      });
+
+      els.productResults.addEventListener("click", (event) => {
+        const option = event.target.closest("[data-threshold-product]");
+        if (option) selectThresholdProduct(option.dataset.thresholdProduct);
+      });
+
+      els.productQuantity.addEventListener("input", () => {
+        state.editor.quantity = els.productQuantity.value;
+        renderProductEditor();
+      });
+
+      els.productQuantity.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" && !els.productSave.disabled) {
+          event.preventDefault();
+          saveProductThreshold();
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          closeAddLine();
+        }
+      });
+
+      els.productSave.addEventListener("click", saveProductThreshold);
+      els.productCancel.addEventListener("click", closeAddLine);
+
+      els.productRows.addEventListener("click", (event) => {
+        const editButton = event.target.closest("[data-edit-limit]");
+        if (editButton) {
+          openRowEdit(editButton.dataset.editLimit);
+          return;
+        }
+        if (event.target.closest("[data-save-limit]")) {
+          saveRowEdit();
+          return;
+        }
+        if (event.target.closest("[data-cancel-limit]")) {
+          cancelRowEdit();
+          return;
+        }
+        const removeButton = event.target.closest("[data-remove-threshold]");
+        if (removeButton) openRemoveThreshold(removeButton.dataset.removeThreshold);
+      });
+
+      els.productRows.addEventListener("input", (event) => {
+        if (event.target.matches("[data-limit-input]") && state.rowEdit) updateRowEditState(event.target);
+      });
+
+      els.productRows.addEventListener("keydown", (event) => {
+        if (!event.target.matches("[data-limit-input]")) return;
+        if (event.key === "Enter") {
+          event.preventDefault();
+          saveRowEdit();
+        }
+        if (event.key === "Escape") {
+          event.preventDefault();
+          cancelRowEdit();
+        }
+      });
+
+      els.productFooter.addEventListener("click", (event) => {
+        const pageButton = event.target.closest("[data-page]");
+        if (!pageButton || pageButton.disabled) return;
+        state.productPage = Number(pageButton.dataset.page);
+        renderProductThresholds();
+      });
+
+      els.productFooter.addEventListener("change", (event) => {
+        if (!event.target.matches("[data-page-size]")) return;
+        state.productPageSize = Number(event.target.value);
+        state.productPage = 1;
+        renderProductThresholds();
+      });
+
+      els.confirmRemove.addEventListener("click", removeThreshold);
+      document.querySelectorAll("[data-close-remove]").forEach((button) => {
+        button.addEventListener("click", () => els.removeDialog.close());
+      });
+
+      // Clicking outside the product search closes its results.
+      document.addEventListener("click", (event) => {
+        if (state.editor.open && !event.target.closest(".threshold-search")) {
+          state.editor.open = false;
+          renderProductEditor();
+        }
+      });
+
+      // The mouse wheel must not change a threshold; it scrolls the page instead.
+      [els.viewGenericThreshold, els.viewProductThreshold].forEach((view) => view.addEventListener("wheel", (event) => {
+        if (!event.target.matches('input[type="number"]') || document.activeElement !== event.target) return;
+        event.preventDefault();
+        window.scrollBy(event.deltaX, event.deltaY);
+      }, { passive: false }));
+
+      resetGenericDraft();
+      state.editor = emptyEditor();
+      resetAuditFilters();
+      render();
+    })();
+  </script>
+</body>
+
+</html>
